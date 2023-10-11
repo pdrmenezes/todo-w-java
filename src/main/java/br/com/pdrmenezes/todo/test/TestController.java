@@ -1,4 +1,4 @@
-package br.com.pdrmenezes.todo.controller;
+package br.com.pdrmenezes.todo.test;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
