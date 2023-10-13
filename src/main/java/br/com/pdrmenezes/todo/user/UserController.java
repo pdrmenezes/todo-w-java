@@ -16,6 +16,13 @@ public class UserController {
 
   @PostMapping("/create")
   public UserModel create(@RequestBody UserModel userModel){
+    // with the findByUsername method created in the interface we can access it on the controller
+    var user = this.userRepository.findByUsername(userModel.getUsername());
+    if(user != null){
+      System.out.println("Usuário já existe");
+      return null;
+    }
+
     // now with the userRepository extending the jpa interface, we can access all of its methods (count, delete, find, findById, save...)
     // this.userRepository.
     var createdUser = this.userRepository.save(userModel);
