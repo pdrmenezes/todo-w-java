@@ -23,6 +23,8 @@ public class UserModel {
   private String name;
   private String password;
   @CreationTimestamp
+  // because of the property's capital letter, the db will convert it's column name automatically to 'created_at'
+  // for consistency's sake we could already create it as 'created_at' in the model but it's against java's property naming conventions(?)
   private LocalDateTime createdAt;
   
 }
