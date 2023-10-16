@@ -20,7 +20,7 @@ public class UserController {
   private IUserRepository userRepository;
 
   @PostMapping("/create")
-  public ResponseEntity create(@RequestBody UserModel userModel) {
+  public ResponseEntity createUser(@RequestBody UserModel userModel) {
     // with the findByUsername method created in the interface we can access it on
     // the controller
     var user = this.userRepository.findByUsername(userModel.getUsername());
