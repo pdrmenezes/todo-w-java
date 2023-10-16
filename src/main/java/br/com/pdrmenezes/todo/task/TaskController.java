@@ -1,5 +1,7 @@
 package br.com.pdrmenezes.todo.task;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,8 @@ public class TaskController {
   @PostMapping("/create")
   public TaskModel create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
     var userId = request.getAttribute("userId");
+    // "casting" the userId as uuid
+    taskModel.setId((UUID) userId);
     var createdTask = this.taskRepository.save(taskModel);
     return createdTask;
   }
