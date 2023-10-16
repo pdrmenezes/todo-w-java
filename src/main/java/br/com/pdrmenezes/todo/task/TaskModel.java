@@ -31,7 +31,7 @@ public class TaskModel {
 
   public void setTitle(String title) throws Exception {
     if (title.length() > 50) {
-      throw new Exception("Title may have up to 50 characters.");
+      throw new Exception("Titles may have up to 50 characters.");
     } else {
       this.title = title;
     }
