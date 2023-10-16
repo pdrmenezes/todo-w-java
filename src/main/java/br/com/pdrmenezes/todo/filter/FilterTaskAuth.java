@@ -24,14 +24,16 @@ public class FilterTaskAuth extends OncePerRequestFilter {
       throws ServletException, IOException {
     // only validate user on '/tasks/create' path
     var servletPath = request.getServletPath();
+    System.out.println(servletPath);
     if (servletPath.equals("/tasks/create")) {
       // get auth info, remove the "Basic" string and decode from base64 to byte array
       // then to string array (expected final decoded output 'user:password')
-      var encodedAuthData = request.getHeader("Authorization");
+      var encodedRawAuthData = request.getHeader("Authorization");
       // encodedAuthData.substring(6);
-      encodedAuthData.substring("Basic".length()).trim();
+      var encodedAuthData = encodedRawAuthData.substring("Basic".length()).trim();
       byte[] byteArrayAuthData = Base64.getDecoder().decode(encodedAuthData);
       var decodedAuthData = new String(byteArrayAuthData);
+
       var username = decodedAuthData.split(":")[0];
       var password = decodedAuthData.split(":")[1];
 

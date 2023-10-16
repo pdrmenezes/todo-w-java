@@ -24,7 +24,7 @@ public class TaskController {
   public ResponseEntity createTask(@RequestBody TaskModel taskModel, HttpServletRequest request) {
     var userId = request.getAttribute("userId");
     // "casting" the userId as uuid
-    taskModel.setId((UUID) userId);
+    taskModel.setUserId((UUID) userId);
 
     if (taskModel.getEndAt().isBefore(taskModel.getStartAt())) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start Date must be before End Date");
