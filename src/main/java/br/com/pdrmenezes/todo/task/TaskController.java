@@ -3,6 +3,8 @@ package br.com.pdrmenezes.todo.task;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +19,17 @@ public class TaskController {
   private ITaskRepository taskRepository;
 
   @PostMapping("/create")
-  public TaskModel create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
+  public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
     var userId = request.getAttribute("userId");
     // "casting" the userId as uuid
     taskModel.setId((UUID) userId);
+
+    if (taskModel.getEndAt().isBefore(taskModel.getStartAt())) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start Date must be before End Date");
+    }
+
     var createdTask = this.taskRepository.save(taskModel);
-    return createdTask;
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
   }
 
 }
