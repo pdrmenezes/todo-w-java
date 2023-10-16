@@ -22,29 +22,35 @@ public class FilterTaskAuth extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    // get auth info, remove the "Basic" string and decode from base64 to byte array
-    // then to string array (expected final decoded output 'user:password')
-    var encodedAuthData = request.getHeader("Authorization");
-    // encodedAuthData.substring(6);
-    encodedAuthData.substring("Basic".length()).trim();
-    byte[] byteArrayAuthData = Base64.getDecoder().decode(encodedAuthData);
-    var decodedAuthData = new String(byteArrayAuthData);
-    var username = decodedAuthData.split(":")[0];
-    var password = decodedAuthData.split(":")[1];
+    // only validate user on '/tasks/create' path
+    var servletPath = request.getServletPath();
+    if (servletPath.equals("/tasks/create")) {
+      // get auth info, remove the "Basic" string and decode from base64 to byte array
+      // then to string array (expected final decoded output 'user:password')
+      var encodedAuthData = request.getHeader("Authorization");
+      // encodedAuthData.substring(6);
+      encodedAuthData.substring("Basic".length()).trim();
+      byte[] byteArrayAuthData = Base64.getDecoder().decode(encodedAuthData);
+      var decodedAuthData = new String(byteArrayAuthData);
+      var username = decodedAuthData.split(":")[0];
+      var password = decodedAuthData.split(":")[1];
 
-    // validate user
-    var userExists = this.userRepository.findByUsername(username);
-    if (userExists == null) {
-      response.sendError(401);
-    } else {
-      // validate password
-      var passwordVerification = BCrypt.verifyer().verify(password.toCharArray(), userExists.getPassword());
-      if (passwordVerification.verified) {
-        // move on
-        filterChain.doFilter(request, response);
-      } else {
+      // validate user
+      var userExists = this.userRepository.findByUsername(username);
+      if (userExists == null) {
         response.sendError(401);
+      } else {
+        // validate password
+        var passwordVerification = BCrypt.verifyer().verify(password.toCharArray(), userExists.getPassword());
+        if (passwordVerification.verified) {
+          request.setAttribute("userId", userExists.getId());
+          filterChain.doFilter(request, response);
+        } else {
+          response.sendError(401);
+        }
       }
+    } else {
+      filterChain.doFilter(request, response);
     }
 
   }
