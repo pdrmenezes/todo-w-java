@@ -47,18 +47,28 @@ public class TaskController {
   }
 
   @PatchMapping("/update/{taskId}")
-  public TaskModel updateTask(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID taskId) {
+  public ResponseEntity updateTask(@RequestBody TaskModel taskModel, HttpServletRequest request,
+      @PathVariable UUID taskId) {
     var userId = request.getAttribute("userId");
     taskModel.setUserId((UUID) userId);
 
     var taskToBeEdited = this.taskRepository.findById(taskId).orElse(null);
-    // merging the already existing task with the information coming from the
-    // request
+
+    // user is not allowed to update a task that doesn't exist
+    if (taskToBeEdited == null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task not found.");
+    }
+
+    // user is not allowed to update a task that it's not theirs
+    if (!taskToBeEdited.getUserId().equals(request.getAttribute("userId"))) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Operation not allowed.");
+    }
+    // copying only the properties from the request to the already existing task
     Utils.copyNonNullProperties(taskModel, taskToBeEdited);
 
     var updatedTask = this.taskRepository.save(taskToBeEdited);
 
-    return updatedTask;
+    return ResponseEntity.status(HttpStatus.CREATED).body(updatedTask);
   }
 
 }
